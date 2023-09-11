@@ -75,18 +75,15 @@ def get_all_users_with_pagination(start: int, limit : int) -> list[FullUserProfi
 
 
 
-def create_user(full_profile_info : FullUserProfile) -> int:
+def create_update_user(full_profile_info : FullUserProfile, new_user_id: Optional[int] = None) -> int:
     global profile_infos
     global users_content
 
-    new_user_id = len(profile_infos)
+    if new_user_id is None:
+        new_user_id = len(profile_infos)
     liked_posts = full_profile_info.liked_posts
     short_description = full_profile_info.short_description
     long_bio = full_profile_info.long_bio
-
-    print("before:")
-    print("users_content", users_content)
-    print("profiles_infos", profile_infos)
 
     users_content[new_user_id] = {
         "liked_posts": liked_posts
@@ -96,9 +93,6 @@ def create_user(full_profile_info : FullUserProfile) -> int:
         "short_description": short_description,
         "long_bio": long_bio
     }
-    print("after:")
-    print("users_content", users_content)
-    print("profiles_infos", profile_infos)
 
     return new_user_id
 
@@ -109,9 +103,12 @@ def get_user_by_id(user_id : int):
 
     return full_user_profile
 
-@app.get("/",  response_class=  PlainTextResponse)
-def home():
-    return "Welcome"
+@app.put("/user/{user_id}")
+def update_user(user_id: int, full_profile_info : FullUserProfile):
+    create_update_user(full_profile_info, user_id)
+    
+    return None
+
 
 @app.get("/users", response_model=MultipleUsersResponse)
 def get_all_users_paginated(start: int = 0, limit: int = 2):
@@ -122,7 +119,10 @@ def get_all_users_paginated(start: int = 0, limit: int = 2):
 @app.post("/users", response_model = CreateUserResponse)
 def add_user(full_profile_info : FullUserProfile):
     
-    user_id =  create_user(full_profile_info)
+    user_id =  create_update_user(full_profile_info)
     created_user = CreateUserResponse(user_id = user_id)
     return created_user
 
+@app.get("/",  response_class=  PlainTextResponse)
+def home():
+    return "Welcome"
