@@ -19,7 +19,6 @@ users_content = {
 
 app = FastAPI()
 
-
 class User(BaseModel):
     username: str = Field(
         alias = "name",
@@ -44,7 +43,7 @@ class MultipleUsersResponse(BaseModel):
 class CreateUserResponse(BaseModel):
     user_id : int
 
-def get_user_info(user_id : int = 0) -> FullUserProfile:
+async def get_user_info(user_id : int = 0) -> FullUserProfile:
     profile_info = profile_infos[user_id]
     user_content = users_content[user_id]
 
@@ -57,7 +56,7 @@ def get_user_info(user_id : int = 0) -> FullUserProfile:
     
     return FullUserProfile(**full_user_profile)
 
-def get_all_users_with_pagination(start: int, limit : int) -> list[FullUserProfile]:
+async def get_all_users_with_pagination(start: int, limit : int) -> list[FullUserProfile]:
 
     list_of_users = []
     keys = list(profile_infos.keys())
@@ -66,7 +65,7 @@ def get_all_users_with_pagination(start: int, limit : int) -> list[FullUserProfi
         if index < start:
             continue
         current_key = keys[index]
-        user = get_user_info(current_key)
+        user = await get_user_info(current_key)
         list_of_users.append(user)
         if len(list_of_users) >= limit:
             break
@@ -75,7 +74,7 @@ def get_all_users_with_pagination(start: int, limit : int) -> list[FullUserProfi
 
 
 
-def create_update_user(full_profile_info : FullUserProfile, user_id: Optional[int] = None) -> int:
+async def create_update_user(full_profile_info : FullUserProfile, user_id: Optional[int] = None) -> int:
     """
     Create user and new unique user id if not exists otherwise update the user
 
@@ -103,7 +102,7 @@ def create_update_user(full_profile_info : FullUserProfile, user_id: Optional[in
 
     return user_id
 
-def delete_user(user_id: int) -> None:
+async def delete_user(user_id: int) -> None:
     global profile_infos
     global users_content
 
@@ -112,7 +111,7 @@ def delete_user(user_id: int) -> None:
 
 
 @app.get("/user/{user_id}", response_model=FullUserProfile)
-def get_user_by_id(user_id : int):
+async def get_user_by_id(user_id : int):
     """
     Endpoint for retrieving a FullUserProfile by the user's unique integer id
 
@@ -120,30 +119,30 @@ def get_user_by_id(user_id : int):
     :return: FullUserProfile
     """
 
-    full_user_profile = get_user_info(user_id)
+    full_user_profile = await get_user_info(user_id)
 
     return full_user_profile
 
 @app.put("/user/{user_id}")
-def update_user(user_id: int, full_profile_info : FullUserProfile):
-    create_update_user(full_profile_info, user_id)
+async def update_user(user_id: int, full_profile_info : FullUserProfile):
+    await reate_update_user(full_profile_info, user_id)
 
     return None
 
 @app.delete("/user/{user_id}")
-def remove_user(user_id: int):
-    delete_user(user_id)
+async def remove_user(user_id: int):
+    await delete_user(user_id)
 
 @app.get("/users", response_model=MultipleUsersResponse)
-def get_all_users_paginated(start: int = 0, limit: int = 2):
-    users = get_all_users_with_pagination(start, limit)
+async def get_all_users_paginated(start: int = 0, limit: int = 2):
+    users = await get_all_users_with_pagination(start, limit)
     formatted_users = MultipleUsersResponse(users=users)
     return formatted_users
 
 @app.post("/users", response_model = CreateUserResponse)
-def add_user(full_profile_info : FullUserProfile):
+async def add_user(full_profile_info : FullUserProfile):
     
-    user_id =  create_update_user(full_profile_info)
+    user_id =  await create_update_user(full_profile_info)
     created_user = CreateUserResponse(user_id = user_id)
     return created_user
 
