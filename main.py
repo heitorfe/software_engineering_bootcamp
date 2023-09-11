@@ -96,6 +96,14 @@ def create_update_user(full_profile_info : FullUserProfile, new_user_id: Optiona
 
     return new_user_id
 
+def delete_user(user_id: int) -> None:
+    global profile_infos
+    global users_content
+
+    del profile_infos[user_id]
+    del users_content[user_id]
+
+
 @app.get("/user/{user_id}", response_model=FullUserProfile)
 def get_user_by_id(user_id : int):
 
@@ -106,9 +114,12 @@ def get_user_by_id(user_id : int):
 @app.put("/user/{user_id}")
 def update_user(user_id: int, full_profile_info : FullUserProfile):
     create_update_user(full_profile_info, user_id)
-    
+
     return None
 
+@app.delete("/user/{user_id}")
+def remove_user(user_id: int):
+    delete_user(user_id)
 
 @app.get("/users", response_model=MultipleUsersResponse)
 def get_all_users_paginated(start: int = 0, limit: int = 2):
