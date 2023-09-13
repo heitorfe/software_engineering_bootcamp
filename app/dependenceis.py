@@ -4,7 +4,7 @@ from fastapi import Response, HTTPException
 count = 0
 start_time = time.time()
 reset_interval = 10
-limit = 5
+limit = 50
 
 def rate_limit(response: Response) -> None:
     global start_time
