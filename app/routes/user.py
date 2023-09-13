@@ -9,15 +9,15 @@ from app.dependenceis import rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format =  '%(levelname)-6s %(name)-15s %(asctime)s.%(msecs)03d %(message)s',
-    datefmt= "%y-%m-%d %H:%M:%S",
-    filename = "log.txt",
-    )
-logger.setLevel(logging.INFO)
+# logging.basicConfig(
+#     format =  '%(levelname)-6s %(name)-15s %(asctime)s.%(msecs)03d %(message)s',
+#     datefmt= "%y-%m-%d %H:%M:%S",
+#     filename = "log.txt",
+#     )
+# logger.setLevel(logging.INFO)
 
-console = logging.StreamHandler()
-logger.addHandler(console)
+# console = logging.StreamHandler()
+# logger.addHandler(console)
 
 
 def create_user_router(profile_infos : dict, users_content : dict ) -> APIRouter:

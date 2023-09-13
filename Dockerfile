@@ -1,11 +1,28 @@
-FROM python:3.9-alpine 
+FROM python:3.9-alpine AS base
+ 
+ENV PYROOT /pyroot
+ENV PYTHONUSERBASE ${PYROOT}
+ENV PATH=${PATH}:${PYROOT}/bin
 
 RUN pip install pipenv
-RUN mkdir -p /usr/src/app/app
-WORKDIR /usr/src/app
-COPY Pipfile Pipfile.lock main.py ./
-COPY app ./app
+COPY Pipfile* ./
+RUN PIP_USER=1 pipenv install --system --deploy --ignore-pipfile
 
-RUN pipenv install --system
+FROM python:3.9-alpine 
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+ENV PYROOT /pyroot
+ENV PYTHONUSERBASE ${PYROOT}
+ENV PATH=${PATH}:${PYROOT}/bin
+
+RUN addgroup -S myapp && adduser -S -G myapp user -u 1234
+COPY  --chown=myapp:user --from=base ${PYROOT}/ ${PYROOT}/
+
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src
+
+COPY --chown=myapp:user app ./app
+
+USER user
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
