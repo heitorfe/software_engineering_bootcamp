@@ -8,11 +8,15 @@ uvicorn = "*"
 fastapi = "*"
 pydantic = "*"
 httpx = "*"
+requests = "*"
+aiohttp = "*"
 
 [dev-packages]
 mypy = "*"
 pytest = "*"
 pytest-asyncio = "*"
+responses = "*"
+aioresponses = "*"
 
 [requires]
 python_version = "3.10"
