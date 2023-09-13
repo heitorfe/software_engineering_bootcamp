@@ -1,7 +1,7 @@
 
 from typing import Optional
 from app.schemas.user import FullUserProfile
-
+from app.exceptions import UserNotFound
 
 class UserService:
 
@@ -54,6 +54,9 @@ class UserService:
         return user_id
     
     async def get_user_info(self,user_id : int = 0) -> FullUserProfile:
+        if user_id not in self.profile_infos:
+            raise UserNotFound(user_id = user_id)
+        
         profile_info = self.profile_infos[user_id]
         user_content = self.users_content[user_id]
 
@@ -67,6 +70,7 @@ class UserService:
         return FullUserProfile(**full_user_profile)
     
     async def delete_user(self, user_id: int) -> None:
-
+        if user_id not in self.profile_infos:
+            raise UserNotFound(user_id = user_id)
         del self.profile_infos[user_id]
         del self.users_content[user_id]
