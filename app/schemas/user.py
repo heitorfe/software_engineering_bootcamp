@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 
 class User(BaseModel):
@@ -12,9 +12,8 @@ class User(BaseModel):
     liked_posts: Optional[list[int]] = Field(
         description = "Array of posts ids the user liked"
     )
+    # model_config = ConfigDict(str_max_length = 50)
 
-    class Config:
-        str_max_length = 50
 
 class FullUserProfile(User):
     short_description: str
@@ -22,6 +21,7 @@ class FullUserProfile(User):
 
 class MultipleUsersResponse(BaseModel):
     users : list[FullUserProfile]
+    total: int
 
 class CreateUserResponse(BaseModel):
     user_id : int
